@@ -22,9 +22,9 @@ if __name__ == '__main__':
     args = parse_args()
 
     if args.all:
-        input_path = '/mnt/gpid07/users/oscar.lorente/pointcloud/ply/outdoor'
-        output_path = '/mnt/gpid07/users/oscar.lorente/openpcdet/beamagine/training/velodyne'
-        image_sets_path = '/mnt/gpid07/users/oscar.lorente/openpcdet/beamagine/ImageSets/train.txt'
+        input_path = '/mnt/gpid08/users/ian.riera/media/pointcloud/ply'
+        output_path = '/mnt/gpid08/users/ian.riera/media/openpcdet/training/velodyne'
+        image_sets_path = '/mnt/gpid08/users/ian.riera/media/openpcdet/imageSets/train.txt'
 
         for subdir, dirs, files in os.walk(input_path):
             for file in files:
