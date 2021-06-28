@@ -26,7 +26,7 @@ def parse_config():
     parser.add_argument('--points_path',  type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\openpcdet\\training\\velodyne\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\kitti\\training\\velodyne\\000008.bin')
     parser.add_argument('--detection_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\beamagine\\dataset\\results\\pickles\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl')
     parser.add_argument('--results',type=float,default=True,help='show bboxes')
-    parser.add_argument('--sample',type=str,default='20200219_184556_541',help='sample name')#20200219_184540_543
+    parser.add_argument('--sample',type=str,default='20200110_135503_976',help='sample name')#20200219_184540_543
     args = parser.parse_args()
 
     return args
