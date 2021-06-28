@@ -1,12 +1,10 @@
 from eval_utils import kitti_common as kitti
 from eval_utils import eval
-def _read_imageset_file(path):
-    with open(path, 'r') as f:
-        lines = f.readlines()
-    return [int(line) for line in lines]
-det_path = "/mnt/gpid08/users/ian.riera/media/openpcdet/training/label_2"
+
+det_path = "/mnt/gpid08/users/ian.riera/media/results/20210628_1018/txt/"
 dt_annos = kitti.get_label_annos(det_path)
-gt_path = "/path/to/your_gt_label_folder"
+
+gt_path = "/mnt/gpid08/users/ian.riera/media/openpcdet/training/label_2/"
 #gt_split_file = "/path/to/val.txt" # from https://xiaozhichen.github.io/files/mv3d/imagesets.tar.gz
 #val_image_ids = _read_imageset_file(gt_split_file)
 gt_annos = kitti.get_label_annos(gt_path)
