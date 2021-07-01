@@ -24,7 +24,8 @@ def parse_config():
     parser.add_argument('--score', type=float, default=0.6, help='confidence threshold to show detections')
     parser.add_argument('--ped', action='store_true', help='only show pedestrian detections')
     parser.add_argument('--points_path',  type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\openpcdet\\training\\velodyne\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\kitti\\training\\velodyne\\000008.bin')
-    parser.add_argument('--detection_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\beamagine\\dataset\\results\\pickles\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl')
+    parser.add_argument('--detection_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\6_results\\20210628_1018\\pickles\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl')
+    parser.add_argument('--gt_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\openpcdet\\training\\label_2_all_pkl\\')
     parser.add_argument('--results',type=float,default=True,help='show bboxes')
     parser.add_argument('--sample',type=str,default='20200110_135503_976',help='sample name')#20200219_184540_543
     args = parser.parse_args()
@@ -56,17 +57,33 @@ def main():
 
         p = list(pred.values())[0]
         for idx, score in enumerate(p['scores']):
-            if not args.ped or args.ped and p['labels'][idx] == 2:
-                if score >= args.score:
-                    filtered_boxes.append(p['boxes'][idx])
-                    filtered_scores.append(p['scores'][idx])
-                    filtered_labels.append(p['labels'][idx])
+ 
+            if score >= args.score:
+                filtered_boxes.append(p['boxes'][idx])
+                filtered_scores.append(p['scores'][idx])
+                filtered_labels.append(p['labels'][idx])
 
-                    if p['labels'][idx] == 2:
-                        print(p['boxes'][idx])
+        with open(args.gt_path+args.sample+'.pkl',
+                    'rb') as f_gt:
+            gt = pickle.load(f_gt)
+        #p = pred['../pointclouds_beamagine/kitti_' + args.sample + '.bin']
+
+
+        gt_boxes = []
+        gt_scores = []
+        gt_labels = []
+
+        g = list(gt.values())[0]
+        for idx, score in enumerate(g['scores']):
+            gt_boxes.append(g['boxes'][idx])
+            gt_scores.append(g['scores'][idx])
+            gt_labels.append(g['labels'][idx])
+
+
+        #print(g['boxes']) 
     if args.results:
         V.draw_scenes(
-            points=points, ref_boxes=np.array(filtered_boxes),
+            points=points, gt_boxes = np.array(gt_boxes), ref_boxes=np.array(filtered_boxes),
             ref_scores=np.array(filtered_scores), ref_labels=np.array(filtered_labels)
         )
     else:

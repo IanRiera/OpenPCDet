@@ -50,9 +50,9 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
     for i in range(num_gt):
         bbox = gt_anno["bbox"][i]
         gt_name = gt_anno["name"][i].lower()
-        print(gt_name)### CONTINUA AQUI
-        print(current_cls_name)
-        height = bbox[3] - bbox[1]
+        #print(gt_name)### CONTINUA AQUI
+        #print(current_cls_name)
+        #height = bbox[3] - bbox[1]
         valid_class = -1
         if (gt_name == current_cls_name):
             valid_class = 1
@@ -64,11 +64,14 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
         else:
             valid_class = -1
         ignore = False
-        if ((gt_anno["occluded"][i] > MAX_OCCLUSION[difficulty])
-                or (gt_anno["truncated"][i] > MAX_TRUNCATION[difficulty])
-                or (height <= MIN_HEIGHT[difficulty])):
+        #print("67: valid_class = {}".format(valid_class)) # NOTE_IAN: es la classe que toca
+        
+        #if ((gt_anno["occluded"][i] > MAX_OCCLUSION[difficulty])
+              #  or (gt_anno["truncated"][i] > MAX_TRUNCATION[difficulty])
+             #   or (height <= MIN_HEIGHT[difficulty])):
             # if gt_anno["difficulty"][i] > difficulty or gt_anno["difficulty"][i] == -1:
-            ignore = True
+            #ignore = True
+
         if valid_class == 1 and not ignore:
             ignored_gt.append(0)
             num_valid_gt += 1
@@ -84,14 +87,15 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
             valid_class = 1
         else:
             valid_class = -1
-        height = abs(dt_anno["bbox"][i, 3] - dt_anno["bbox"][i, 1])
+        '''height = abs(dt_anno["bbox"][i, 3] - dt_anno["bbox"][i, 1])
         if height < MIN_HEIGHT[difficulty]:
             ignored_dt.append(1)
-        elif valid_class == 1:
+            '''
+        if valid_class == 1:
             ignored_dt.append(0)
         else:
             ignored_dt.append(-1)
-
+    #print("num_valid_gt: {}, len ignored_gt: {}, len ignored_dt: {}".format(num_valid_gt,ignored_gt,ignored_dt)) # NOTE_IAN: tot en ordre
     return num_valid_gt, ignored_gt, ignored_dt, dc_bboxes
 
 
@@ -130,7 +134,7 @@ def bev_box_overlap(boxes, qboxes, criterion=-1):
     return riou
 
 
-@numba.jit(nopython=True, parallel=True)
+@numba.jit(nopython=True, parallel=False)
 def d3_box_overlap_kernel(boxes,
                           qboxes,
                           rinc,
@@ -376,9 +380,11 @@ def calculate_iou_partly(gt_annos,
         num_parts: int. a parameter for fast calculate algorithm
         z_axis: height axis. kitti camera use 1, lidar use 2.
     """
+    print("379: INSIDE CALCULATE_IOU_PARTLY\n")
     assert len(gt_annos) == len(dt_annos)
     total_dt_num = np.stack([len(a["name"]) for a in dt_annos], 0)
     total_gt_num = np.stack([len(a["name"]) for a in gt_annos], 0)
+    print("total_dt_num: {} \n total_gt_num: {}\n".format(total_dt_num,total_gt_num))
     num_examples = len(gt_annos)
     split_parts = get_split_parts(num_examples, num_parts)
     parted_overlaps = []
@@ -410,16 +416,19 @@ def calculate_iou_partly(gt_annos,
             overlap_part = bev_box_overlap(gt_boxes,
                                            dt_boxes).astype(np.float64)
         elif metric == 2:
+            print("415: inside metric 3d\n")
             loc = np.concatenate([a["location"] for a in gt_annos_part], 0)
             dims = np.concatenate([a["dimensions"] for a in gt_annos_part], 0)
             rots = np.concatenate([a["rotation_y"] for a in gt_annos_part], 0)
             gt_boxes = np.concatenate([loc, dims, rots[..., np.newaxis]],
                                       axis=1)
+            print("421: gt_boxes = {}\n".format(gt_boxes[0]))
             loc = np.concatenate([a["location"] for a in dt_annos_part], 0)
             dims = np.concatenate([a["dimensions"] for a in dt_annos_part], 0)
             rots = np.concatenate([a["rotation_y"] for a in dt_annos_part], 0)
             dt_boxes = np.concatenate([loc, dims, rots[..., np.newaxis]],
                                       axis=1)
+            print("427: dt_boxes = {}\n".format(dt_boxes[0]))
             overlap_part = d3_box_overlap(
                 gt_boxes, dt_boxes, z_axis=z_axis,
                 z_center=z_center).astype(np.float64)
@@ -443,7 +452,7 @@ def calculate_iou_partly(gt_annos,
             gt_num_idx += gt_box_num
             dt_num_idx += dt_box_num
         example_idx += num_part
-
+    print("451: overlaps = {}\n, parted_overlaps = {}\n".format(overlaps, parted_overlaps)) #FALLA AQUI
     return overlaps, parted_overlaps, total_gt_num, total_dt_num
 
 
@@ -454,7 +463,7 @@ def _prepare_data(gt_annos, dt_annos, current_class, difficulty):
     ignored_gts, ignored_dets, dontcares = [], [], []
     total_num_valid_gt = 0
     for i in range(len(gt_annos)):
-        rets = clean_data(gt_annos[i], dt_annos[i], current_class, difficulty)
+        rets = clean_data(gt_annos[i], dt_annos[i], current_class, difficulty) #FALLA AQUI
         num_valid_gt, ignored_gt, ignored_det, dc_bboxes = rets
         ignored_gts.append(np.array(ignored_gt, dtype=np.int64))
         ignored_dets.append(np.array(ignored_det, dtype=np.int64))
@@ -503,6 +512,8 @@ def eval_class(gt_annos,
     Returns:
         dict of recall, precision and aos
     """
+    print("506: INSIDE eval_class")
+    print("len gt_annos: {}, len dt_annos: {}, metric: {}, current_classes".format(len(gt_annos),len(dt_annos),metric,current_classes))
     assert len(gt_annos) == len(dt_annos)
     num_examples = len(gt_annos)
     split_parts = get_split_parts(num_examples, num_parts)
@@ -590,7 +601,7 @@ def eval_class(gt_annos,
                         aos[m, l, k, i] = np.max(aos[m, l, k, i:], axis=-1)
 
     ret_dict = {
-        # "recall": recall, # [num_class, num_difficulty, num_minoverlap, N_SAMPLE_PTS]
+        "recall": recall, # [num_class, num_difficulty, num_minoverlap, N_SAMPLE_PTS]
         "precision": precision,
         "orientation": aos,
         "thresholds": all_thresholds,
@@ -663,6 +674,9 @@ def do_eval_v3(gt_annos,
     # min_overlaps: [num_minoverlap, metric, num_class]
     types = ["bbox", "bev", "3d"]
     metrics = {}
+    print("666: INSIDE DO_EVAL_V3")
+    print("gt_annos: {}".format(gt_annos)[0])
+    print("dt_annos: {}".format(dt_annos)[0])
     for i in range(3):
         ret = eval_class(
             gt_annos,
@@ -725,11 +739,12 @@ def get_official_eval_result(gt_annos,
         gt_annos and dt_annos must contains following keys:
         [bbox, location, dimensions, rotation_y, score]
     """
+    print("728: INSIDE GET_OFFICIAL_EVAL_RESULT")
     overlap_mod = np.array([[0.5],
-                            [0.5],
-                            [0.5]])
-    overlap_easy = np.array([[0.5],
                             [0.25],
+                            [0.5]])
+    overlap_easy = np.array([[0.1],
+                            [0.05],
                             [0.25]])
     min_overlaps = np.stack([overlap_mod, overlap_easy], axis=0)  # [2, 3, 5]
     class_to_name = {
@@ -754,6 +769,7 @@ def get_official_eval_result(gt_annos,
             if anno['alpha'][0] != -10:
                 compute_aos = True
             break
+    print("758: alpha = {}".format(compute_aos))
     metrics = do_eval_v3(
         gt_annos,
         dt_annos,
