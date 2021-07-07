@@ -3,8 +3,8 @@ import os
 
 
 if __name__ == '__main__':
-    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210628_1018/pickles/'
-    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210628_1018/txt_aux/'
+    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/pickles/'
+    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/txt/'
     
     for filename in os.listdir(src_path):
         if filename.endswith(".pkl"):

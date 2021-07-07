@@ -1,9 +1,9 @@
 import pickle
 
 if __name__ == '__main__':
-    all_pickle_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/results/fusion_dataset_pred_pointrcnn.pkl'
-    example_path = 'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl'
-    results_path= 'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\beamagine\\dataset\\results\\pickles\\'
+    all_pickle_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/000008_pred_pv_rcnn.pkl'
+    example_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/000008_pred_pv_rcnn.pkl'
+    results_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/pickles/'
     objects = []
     example = []
 

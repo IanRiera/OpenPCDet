@@ -24,8 +24,8 @@ def parse_config():
     parser.add_argument('--score', type=float, default=0.6, help='confidence threshold to show detections')
     parser.add_argument('--ped', action='store_true', help='only show pedestrian detections')
     parser.add_argument('--points_path',  type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\openpcdet\\training\\velodyne\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\kitti\\training\\velodyne\\000008.bin')
-    parser.add_argument('--detection_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\6_results\\20210628_1018\\pickles\\')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl')
-    parser.add_argument('--gt_path', type=str, default='D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\media\\openpcdet\\training\\label_2_all_pkl\\')
+    parser.add_argument('--detection_path', type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/results/openpcdet/0_demo/pickles/')#'D:\\Ian\\UNI\\5_Master_CV\\M9_TFM\\results\\openpcdet\\0_demo\\000008_pred_pv_rcnn.pkl')
+    parser.add_argument('--gt_path', type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet_old/training/pickles/')
     parser.add_argument('--results',type=float,default=True,help='show bboxes')
     parser.add_argument('--sample',type=str,default='20200110_135503_976',help='sample name')#20200219_184540_543
     args = parser.parse_args()

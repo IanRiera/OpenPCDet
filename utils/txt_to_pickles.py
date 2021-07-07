@@ -4,8 +4,8 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210628_1018/txt_aux/'
-    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet/training/label_2_all_pkl/'
+    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet_old/training/label_2/'
+    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet_old/training/pickles/'
     #aux_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/results/pickles/'
 
     for filename in os.listdir(src_path):
@@ -42,7 +42,9 @@ if __name__ == '__main__':
                 # Pedestrian -1 -1 -10 -1 -1 -1 -1 dz dx dy y1 z1 x1 heading score 
                 # [x, y, z, dx, dy, dz, heading]
                 tokens = object.split(' ')
-                box = np.asarray([float(tokens[13]),float(tokens[11]),float(tokens[12]),float(tokens[9]),float(tokens[10]),float(tokens[8]),float(tokens[14])])
+                #box = np.asarray([float(tokens[13]),float(tokens[11]),float(tokens[12]),float(tokens[9]),float(tokens[10]),float(tokens[8]),float(tokens[14])])
+                # Pedestrian -1 -1 -10 -1 -1 -1 -1 dz dy dx y1 -z1 x1 heading score 
+                box = np.asarray([float(tokens[13]),-float(tokens[11]),-float(tokens[12]),float(tokens[9]),float(tokens[8]),float(tokens[10]),float(tokens[14])])
                 dict[name]['boxes'].append(box)
                 dict[name]['labels'].append(1)
                 dict[name]['scores'].append(float(tokens[-1]))
