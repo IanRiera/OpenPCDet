@@ -80,7 +80,7 @@ def main():
         common_utils.set_random_seed(666)
 
     # output_dir = cfg.ROOT_DIR / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
-    output_dir = Path('/mnt/gpid08/users/ian.riera/media/pcdet_training/beamagine/output') / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
+    output_dir = Path('/mnt/gpid08/users/ian.riera/media/pcdet_training/beamagine/output') / cfg.EXP_GROUP_PATH / cfg.TAG / ('%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
     ckpt_dir = output_dir / 'ckpt'
     output_dir.mkdir(parents=True, exist_ok=True)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
