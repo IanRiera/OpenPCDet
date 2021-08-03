@@ -3,8 +3,8 @@ import os
 
 
 if __name__ == '__main__':
-    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210630_2200/pickles/'
-    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210630_2200/label_3/'
+    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210721_182632/pickles_1/'
+    dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210721_182632/txt_2/'
     
     for filename in os.listdir(src_path):
         if filename.endswith(".pkl"):
@@ -26,7 +26,7 @@ if __name__ == '__main__':
                     f = open(dst_path+"{}.txt".format(filename.split('.')[0]), "a+")
                    
                     f.write("Pedestrian -1 -1 -10 -1 -1 -1 -1 {} {} {} {} {} {} {} {}\n".format(box[5],box[4],box[3],-box[1],box[2],box[0],box[6], value["scores"][i]))
-                   
+              
 
                     f.close()
                     

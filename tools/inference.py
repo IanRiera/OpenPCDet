@@ -12,11 +12,18 @@ from pcdet.config import cfg, cfg_from_yaml_file
 from pcdet.datasets import DatasetTemplate
 from pcdet.models import build_network, load_data_to_gpu
 from pcdet.utils import common_utils
-from visual_utils import visualize_utils as V
+#from visual_utils import visualize_utils as V
 
 import pickle
 from datetime import datetime
 
+from scipy.spatial import ConvexHull
+from numpy import *
+
+from tqdm import tqdm
+import matplotlib.pyplot as plt
+import pandas as pd
+from eval.evaluator import *
 
 class DemoDataset(DatasetTemplate):
     def __init__(self, dataset_cfg, class_names, training=True, root_path=None, logger=None, ext='.bin'):
@@ -60,12 +67,15 @@ class DemoDataset(DatasetTemplate):
 
 def parse_config():
     parser = argparse.ArgumentParser(description='arg parser')
-    parser.add_argument('--cfg_file', type=str, default='cfgs/kitti_models/second.yaml',
+    parser.add_argument('--cfg_file', type=str, default='cfgs/kitti_models/pointrcnn.yaml',
                         help='specify the config for demo')
     parser.add_argument('--data_path', type=str, default='demo_data',
                         help='specify the point cloud data file or directory')
     parser.add_argument('--ckpt', type=str, default=None, help='specify the pretrained model')
     parser.add_argument('--ext', type=str, default='.bin', help='specify the extension of your point cloud data file')
+    parser.add_argument('--threshold', type=float, default=0.5, help='specify the min iou to be accepted as a detection')
+    parser.add_argument('--train_num', type=int, default=32000, help='specify the number of points per frame')
+    parser.add_argument('--n_inter', type=int, default=40, help='specify the interpolation number to calculate the mAP from the precision-recall curve')
 
     args = parser.parse_args()
 
@@ -135,8 +145,8 @@ def main():
     # YYmmdd_HM
     dt_string = now.strftime("%Y%m%d_%H%M")
     print(dt_string)
-    results_path = '/mnt/gpid08/users/ian.riera/media/results/{}/'.format(dt_string)
-    mkdir_p(results_path)
+    results_path = os.path.split(args.cfg_file)[0]+"/"
+
 
         
     with open( results_path + 'pred_' + args.cfg_file.split('/')[-1].split('.')[0] + '.pkl', 'wb') as f: #args.data_path.split('/')[-1].split('.')[0] +
@@ -172,7 +182,7 @@ def main():
     logger.info('Pickle extraction done.')
 
 #---pickle to kitti label format (txt)---
-# to use the evaluator and refine the results on the lebeller, we need to save the results in txt label format
+# to refine the results on the lebeler, we need to save the results in txt label format
     logger.info('Data postprocessing: pickle to kitti label format')    
     txt_path = results_path+'txt/'
     mkdir_p(txt_path)
@@ -189,20 +199,56 @@ def main():
 
             for key, value in objects[0].items():
                 # Pedestrian -1 -1 -10 -1 -1 -1 -1 h w l x y z heading score 
-                # Pedestrian -1 -1 -10 -1 -1 -1 -1 dz dx dy y1 z1 x1 heading score 
+                # Pedestrian -1 -1 -10 -1 -1 -1 -1 dz dy dx -y1 z1 x1 heading score 
                 # [x, y, z, dx, dy, dz, heading]
 
                 for i in range(0,len(value["boxes"])):
                     box = value["boxes"][i]
                     f = open(txt_path+"{}.txt".format(filename.split('.')[0]), "a+")
-                    f.write("pedestrian -1 -1 -10 -1 -1 -1 -1 {} {} {} {} {} {} {} {}\n".format(box[5],box[3],box[4],box[1],box[2],box[0],box[6], value["scores"][i]))
+                    f.write("Pedestrian -1 -1 -10 -1 -1 -1 -1 {} {} {} {} {} {} {} {}\n".format(box[5],box[4],box[3],-box[1],box[2],box[0],box[6], value["scores"][i]))
                     f.close()
     
     logger.info('Txt conversion done')    
     
+#---TEST EVALUATION---
+    logger.info('mAP evaluation')
+
+    print('------------------')
+    print('--Evaluating frames--')
+    
+    #PARAMS
+    det_folder =results_path+ 'pickles/'
+    gt_folder = '/mnt/gpid08/users/ian.riera/media/openpcdet/training/pickles/'
+    plots_path= results_path+ 'plots/'
+    mkdir_p(plots_path)
 
 
-    logger.info('Inference done.')
+    #INIT VARIABLES  
+    tp=0
+    fp=0
+    fn=0
+    gt_len=0 #number of objects detected on the groundtruth
+    conf_det = {'confidence':[],'detection':[]}
+
+    for filename in tqdm(os.listdir(det_folder)):
+        
+        if filename.endswith(".pkl"):
+            det_path = det_folder+filename
+            gt_path = gt_folder+filename
+            (tps,fps,fns,conf_det,gt_lens) = evaluate_frame(det_path,gt_path,det_threshold=args.threshold,conf_det = conf_det)
+            tp=tp+tps
+            fp=fp+fps
+            fn=fn+fns
+            gt_len=gt_len+gt_lens
+      
+    logger.info("Control: There are {} objects on the groundtruth, {} in the detections. \n".format(gt_len,tp+fn))
+    print("Control: There are {} objects on the groundtruth, {} in the detections. \n".format(gt_len,tp+fn),file=open(results_path+"mAP.txt", "w"))
+
+    ap,ap_n = PrecisionRecallCurve(conf_det,gt_len,results_path,train_num=args.train_num)
+    print("The ap (all-points Interpolated) is of {}.\n The ap ({} point Interpolated) is of {}.\n".format(round(ap,2),args.n_inter,round(ap_n,2)),file=open(results_path+"mAP.txt", "a+"))
+    logger.info("The ap (all-points Interpolated) is of {}.\n The ap ({} point Interpolated) is of {}.\n".format(round(ap,2),args.n_inter,round(ap_n,2)))
+
+    logger.info('Evaluation complete.')
 
 
 if __name__ == '__main__':

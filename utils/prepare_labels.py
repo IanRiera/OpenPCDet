@@ -6,8 +6,8 @@ import numpy as np
 if __name__ == '__main__':
     #src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2/'
     #dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/pickles/'
-    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210727_190555/txt_2/'
-    dst_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210727_190555/pickles_2/'
+    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2/'
+    dst_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2_prepared/'
 
     for filename in os.listdir(src_path):
         if filename.endswith(".txt"):
@@ -27,16 +27,6 @@ if __name__ == '__main__':
  
             file1.close()
 
-            #objects_pkl = []
-            #with (open(aux_path+"{}.pkl".format(filename.split('.')[0]), "rb")) as openfile:
-            #    while True:
-            #        try:
-            #            objects_pkl.append(pickle.load(openfile))
-            #        except EOFError:
-            #            break     
-
-            name = filename.split('.')[0]+'.bin'
-            dict={name: {'boxes':[],'labels':[],'scores':[]}}
             
             for object in objects:
                 # Pedestrian -1 -1 -10 -1 -1 -1 -1 dz dy dx -y1 z1 x1 heading score 
@@ -44,16 +34,10 @@ if __name__ == '__main__':
                 # [x, y, z, dx, dy, dz, heading]
                 # 13 -11 12 10  9  8  14
                 tokens = object.split(' ')
-                box = np.asarray([float(tokens[13]),-float(tokens[11]),float(tokens[12]),float(tokens[10]),float(tokens[9]),float(tokens[8]),float(tokens[14])])
-
-                dict[name]['boxes'].append(box)
-                dict[name]['labels'].append(1)
-                dict[name]['scores'].append(float(tokens[-1]))
-
-            #print(dict)
-            with open(dst_path + filename.split('.')[0] + '.pkl', 'wb') as f: 
-                pickle.dump(dict, f)
-
+                
+                f = open(dst_path+"{}.txt".format(filename.split('.')[0]), "a+")
+                f.write("Pedestrian -1 -1 -10 -1 -1 -1 -1 {} {} {} {} {} {} {} {}\n".format(tokens[8],tokens[9],tokens[10],tokens[11],-float(tokens[12])+(float(tokens[8])/2),tokens[13],tokens[14], tokens[15]))
+                f.close()
  
 
         else:
