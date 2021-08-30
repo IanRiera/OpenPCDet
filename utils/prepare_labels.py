@@ -4,10 +4,11 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    #src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2/'
-    #dst_path = 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/pickles/'
-    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2/'
-    dst_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/label_2_prepared/'
+
+    #src_path=  'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/corrected_labels/'
+    #dst_path=  'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/corrected_prepared/'
+    src_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/kitti/training/label_2/'
+    dst_path= 'D:/Ian/UNI/5_Master_CV/M9_TFM/media/kitti/training/label_2_prepared/'
 
     for filename in os.listdir(src_path):
         if filename.endswith(".txt"):
@@ -36,7 +37,9 @@ if __name__ == '__main__':
                 tokens = object.split(' ')
                 
                 f = open(dst_path+"{}.txt".format(filename.split('.')[0]), "a+")
+                #from refining to openpcdet
                 f.write("Pedestrian -1 -1 -10 -1 -1 -1 -1 {} {} {} {} {} {} {} {}\n".format(tokens[8],tokens[9],tokens[10],tokens[11],-float(tokens[12])+(float(tokens[8])/2),tokens[13],tokens[14], tokens[15]))
+
                 f.close()
  
 
