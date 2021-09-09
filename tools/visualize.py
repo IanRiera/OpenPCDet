@@ -23,11 +23,11 @@ def parse_config():
     parser.add_argument('--model', type=str, default='pointrcnn', help='model used to predict the boxes')
     parser.add_argument('--score', type=float, default=0.1, help='confidence threshold to show detections')
     parser.add_argument('--ped', action='store_true', help='only show pedestrian detections')
-    parser.add_argument('--points_path',  type=str, default="D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet/training/velodyne/")#'D:/Ian/UNI/5_Master_CV/M9_TFM/media/kitti/training/velodyne/')#D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet/training/velodyne/')
-    parser.add_argument('--detection_path', type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/media/demos/')#'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/beamagine/20210801_225632_40/pickles/')#D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210721_182632/pickles_1/')
+    parser.add_argument('--points_path',  type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet/training/velodyne/')#'D:/Ian/UNI/5_Master_CV/M9_TFM/media/kitti/training/velodyne/')#D:/Ian/UNI/5_Master_CV/M9_TFM/media/openpcdet/training/velodyne/')
+    parser.add_argument('--detection_path', type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/beamagine/20210801_004551_16/pickles/')#'D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/beamagine/20210801_225632_40/pickles/')#D:/Ian/UNI/5_Master_CV/M9_TFM/6_results/20210721_182632/pickles_1/')
     parser.add_argument('--gt_path', type=str, default='D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/pickles/')#'D:/Ian/UNI/5_Master_CV/M9_TFM/media/kitti/training/pickles_old/')#'D:/Ian/UNI/5_Master_CV/M9_TFM/media/beamagine/dataset/pickles/')
     parser.add_argument('--results',type=float,default=True,help='show bboxes')
-    parser.add_argument('--sample',type=str,default='20200110_135503_976',help='sample name')#20200219_184540_543
+    parser.add_argument('--sample',type=str,default='20200219_180658_552',help='sample name')#20200219_184540_543
     args = parser.parse_args()
 
     return args
@@ -83,7 +83,7 @@ def main():
         #print(g['boxes']) 
     if args.results:
         V.draw_scenes(
-            points=points, gt_boxes = np.array(gt_boxes), ref_boxes=np.array(filtered_boxes),
+            points=points,  ref_boxes=np.array(filtered_boxes), gt_boxes = np.array(gt_boxes),
             ref_scores=np.array(filtered_scores), ref_labels=np.array(filtered_labels)
         )
     else:
