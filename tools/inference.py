@@ -4,7 +4,7 @@ import argparse
 import glob
 from pathlib import Path
 
-import mayavi.mlab as mlab
+#import mayavi.mlab as mlab
 import numpy as np
 import torch
 
@@ -21,9 +21,9 @@ from scipy.spatial import ConvexHull
 from numpy import *
 
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-import pandas as pd
-from eval.evaluator import *
+
+
+
 
 class DemoDataset(DatasetTemplate):
     def __init__(self, dataset_cfg, class_names, training=True, root_path=None, logger=None, ext='.bin'):
@@ -131,13 +131,6 @@ def main():
             }
 
             data_points[demo_dataset.sample_file_list[idx]] = data_dict['points'][:, 1:].cpu().numpy()
-
-            #V.draw_scenes(
-            #    points=data_dict['points'][:, 1:], ref_boxes=pred_dicts[0]['pred_boxes'],
-            #    ref_scores=pred_dicts[0]['pred_scores'], ref_labels=pred_dicts[0]['pred_labels']
-            #)
-            #mlab.show(stop=True)
-    #print(predictions)
     
         
     # datetime object containing current date and time
@@ -152,8 +145,6 @@ def main():
     with open( results_path + 'pred_' + args.cfg_file.split('/')[-1].split('.')[0] + '.pkl', 'wb') as f: #args.data_path.split('/')[-1].split('.')[0] +
         pickle.dump(predictions, f)
 
-    # with open('data_points.pkl', 'wb') as f:
-    #     pickle.dump(data_points, f)
     
 #---pickle unpackaging---
 # results in openpcdet are saved all together in a single pickle. This part divides the global pickle into a single pickle per scene
@@ -210,45 +201,7 @@ def main():
     
     logger.info('Txt conversion done')    
     
-#---TEST EVALUATION---
-    logger.info('mAP evaluation')
-
-    print('------------------')
-    print('--Evaluating frames--')
-    
-    #PARAMS
-    det_folder =results_path+ 'pickles/'
-    gt_folder = '/mnt/gpid08/users/ian.riera/media/openpcdet/training/pickles/'
-    plots_path= results_path+ 'plots/'
-    mkdir_p(plots_path)
-
-
-    #INIT VARIABLES  
-    tp=0
-    fp=0
-    fn=0
-    gt_len=0 #number of objects detected on the groundtruth
-    conf_det = {'confidence':[],'detection':[]}
-
-    for filename in tqdm(os.listdir(det_folder)):
-        
-        if filename.endswith(".pkl"):
-            det_path = det_folder+filename
-            gt_path = gt_folder+filename
-            (tps,fps,fns,conf_det,gt_lens) = evaluate_frame(det_path,gt_path,det_threshold=args.threshold,conf_det = conf_det)
-            tp=tp+tps
-            fp=fp+fps
-            fn=fn+fns
-            gt_len=gt_len+gt_lens
-      
-    logger.info("Control: There are {} objects on the groundtruth, {} in the detections. \n".format(gt_len,tp+fn))
-    print("Control: There are {} objects on the groundtruth, {} in the detections. \n".format(gt_len,tp+fn),file=open(results_path+"mAP.txt", "w"))
-
-    ap,ap_n = PrecisionRecallCurve(conf_det,gt_len,results_path,train_num=args.train_num)
-    print("The ap (all-points Interpolated) is of {}.\n The ap ({} point Interpolated) is of {}.\n".format(round(ap,2),args.n_inter,round(ap_n,2)),file=open(results_path+"mAP.txt", "a+"))
-    logger.info("The ap (all-points Interpolated) is of {}.\n The ap ({} point Interpolated) is of {}.\n".format(round(ap,2),args.n_inter,round(ap_n,2)))
-
-    logger.info('Evaluation complete.')
+    logger.info('Inference complete.')
 
 
 if __name__ == '__main__':

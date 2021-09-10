@@ -34,7 +34,7 @@ def parse_config():
     parser.add_argument('--fix_random_seed', action='store_true', default=False, help='')
     parser.add_argument('--ckpt_save_interval', type=int, default=1, help='number of training epochs')
     parser.add_argument('--local_rank', type=int, default=0, help='local rank for distributed training')
-    parser.add_argument('--max_ckpt_save_num', type=int, default=30, help='max number of saved checkpoint')
+    parser.add_argument('--max_ckpt_save_num', type=int, default=5, help='max number of saved checkpoint')
     parser.add_argument('--merge_all_iters_to_one_epoch', action='store_true', default=False, help='')
     parser.add_argument('--set', dest='set_cfgs', default=None, nargs=argparse.REMAINDER,
                         help='set extra config keys if needed')
@@ -42,6 +42,7 @@ def parse_config():
     parser.add_argument('--max_waiting_mins', type=int, default=0, help='max waiting minutes')
     parser.add_argument('--start_epoch', type=int, default=0, help='')
     parser.add_argument('--save_to_file', action='store_true', default=False, help='')
+    parser.add_argument('--results_path', type=str, default=None, help='specify the path where to save the training results')
 
     args = parser.parse_args()
 
@@ -80,7 +81,7 @@ def main():
         common_utils.set_random_seed(666)
 
     # output_dir = cfg.ROOT_DIR / 'output' / cfg.EXP_GROUP_PATH / cfg.TAG / args.extra_tag
-    output_dir = Path('/mnt/gpid08/users/ian.riera/media/pcdet_training/beamagine/output') / cfg.EXP_GROUP_PATH / cfg.TAG / ('%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
+    output_dir = Path(args.results_path) / cfg.EXP_GROUP_PATH / cfg.TAG / ('%s' % datetime.datetime.now().strftime('%Y%m%d_%H%M%S'))
     ckpt_dir = output_dir / 'ckpt'
     output_dir.mkdir(parents=True, exist_ok=True)
     ckpt_dir.mkdir(parents=True, exist_ok=True)

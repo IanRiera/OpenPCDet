@@ -452,7 +452,7 @@ def calculate_iou_partly(gt_annos,
             gt_num_idx += gt_box_num
             dt_num_idx += dt_box_num
         example_idx += num_part
-    print("451: overlaps = {}\n, parted_overlaps = {}\n".format(overlaps, parted_overlaps)) #FALLA AQUI
+    #print("451: overlaps = {}\n, parted_overlaps = {}\n".format(overlaps, parted_overlaps)) #FALLA AQUI
     return overlaps, parted_overlaps, total_gt_num, total_dt_num
 
 
@@ -526,7 +526,7 @@ def eval_class(gt_annos,
         z_axis=z_axis,
         z_center=z_center)
     overlaps, parted_overlaps, total_dt_num, total_gt_num = rets
-    N_SAMPLE_PTS = 41
+    N_SAMPLE_PTS = 101
     num_minoverlap = len(min_overlaps)
     num_class = len(current_classes)
     num_difficulty = len(difficultys)
@@ -574,7 +574,7 @@ def eval_class(gt_annos,
                         ignored_dets[idx:idx + num_part], 0)
                     ignored_gts_part = np.concatenate(
                         ignored_gts[idx:idx + num_part], 0)
-                    fused_compute_statistics(
+                    fused_compute_statistics( ##NOTE_IAN: Sigue aqui
                         parted_overlaps[j],
                         pr,
                         total_gt_num[idx:idx + num_part],
@@ -741,11 +741,17 @@ def get_official_eval_result(gt_annos,
     """
     print("728: INSIDE GET_OFFICIAL_EVAL_RESULT")
     overlap_mod = np.array([[0.5],
-                            [0.25],
+                            [0.5],
                             [0.5]])
     overlap_easy = np.array([[0.1],
-                            [0.05],
-                            [0.25]])
+                            [0.1],
+                            [0.1]])
+    #overlap_mod = np.array([[0.7],
+    #                        [0.25],
+    #                        [0.5]])
+    #overlap_easy = np.array([[0.1],
+    #                        [0.05],
+    #                        [0.25]])
     min_overlaps = np.stack([overlap_mod, overlap_easy], axis=0)  # [2, 3, 5]
     class_to_name = {
         0: 'Pedestrian'
@@ -769,7 +775,7 @@ def get_official_eval_result(gt_annos,
             if anno['alpha'][0] != -10:
                 compute_aos = True
             break
-    print("758: alpha = {}".format(compute_aos))
+    #print("758: alpha = {}".format(compute_aos))
     metrics = do_eval_v3(
         gt_annos,
         dt_annos,
